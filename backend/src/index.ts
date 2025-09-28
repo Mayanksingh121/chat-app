@@ -22,7 +22,7 @@ try{
     const redisClient = connetToRedisServer()
     const prismaClient = connetToPrismaClient();
     if(redisClient === null){
-        throw new Error("can't connect to redis server");
+        throw new Error("can't connect to redis server ");
     }
 
     if(prismaClient === null){
