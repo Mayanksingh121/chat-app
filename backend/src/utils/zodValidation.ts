@@ -8,5 +8,10 @@ export const SignupZodValidation = z.object({
 
 export const verifyOtpValidation = z.object({
     email:  z.string().trim().regex(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,"Invalid Email Address"),
-    otp: z.number().min(4, 'Wrong OTP Entered').max(4, 'Wrong OTP Entered')
+    otp: z.number()
+})
+
+export const loginDataValidation = z.object({
+    email: z.string().trim().regex(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,"Invalid Credentials"),
+    password: z.string().trim().min(6, 'Invalid Credentials').max(20, "Invalid Credentials")
 })

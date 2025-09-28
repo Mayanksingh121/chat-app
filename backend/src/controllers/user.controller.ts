@@ -1,7 +1,8 @@
 import { Request, Response } from "express";
 import { connetToPrismaClient, connetToRedisServer } from "../db/dbConnections";
-import { SignupZodValidation, verifyOtpValidation } from "../utils/zodValidation";
-import { hashPassword } from "../utils/helpers";
+import { loginDataValidation, SignupZodValidation, verifyOtpValidation } from "../utils/zodValidation";
+import { checkHashPasswords, generateSessionToken, hashPassword } from "../utils/helpers";
+import { sendSignupOTPEmail } from "../utils/emailService";
 
 export const signup = async(req: Request, res: Response)=>{
     try{
@@ -53,6 +54,7 @@ export const signup = async(req: Request, res: Response)=>{
         }
 
         redisClient?.set(email?.toLowerCase(), JSON.stringify(userData) , 'EX', 60*5);
+        sendSignupOTPEmail(email, otpForTheUser);
         res.status(200).json({message: "OTP Sent To Users Email"})
     }catch(e){
         console.log("@error while signin up the user");
@@ -94,12 +96,89 @@ export const verifyOtp = async(req: Request, res: Response)=>{
             return;
         }
 
-        redisClient?.del(email?.toLowerCase?.trim());
+        redisClient?.del(email?.toLowerCase()?.trim());
         
         const prismaClient = connetToPrismaClient();
+        
+        const existingUser = await prismaClient?.user.findUnique({
+            where: {
+                email: email?.toLowerCase()?.trim()
+            }
+        });
 
+
+        if(existingUser){
+            res.status(400).json({message: "Email already used"});
+            return;
+        }
+
+        await prismaClient?.user.create({
+            data: {
+                name: jsonData?.name,
+                email: email?.toLowerCase()?.trim(),
+                password: jsonData?.password
+            }
+        });
+        generateSessionToken(email, res);
+        res.status(200).json({message: "Account Created Successfully"});
     }catch(e){
         console.log("@error while verifying the otp ", e);
+        res.status(500).json({message: "Internal Server Error"});
+    }
+}
+
+export const login = async(req: Request, res: Response)=>{
+    try{
+        const {email, password} = req.body;
+
+        if(!email || !password){
+            res.status(400).json({message: "Invalid Credentials"});
+            return;
+        }
+
+        const {success} = loginDataValidation.safeParse({
+            email,
+            password
+        });
+
+        if(!success){
+            res.status(400).json({message: "Invalid Credentials"});
+        }
+
+        const prismaClient = connetToPrismaClient();
+
+        const user = await prismaClient?.user.findUnique({
+            where: {
+                email: email?.trim()?.toLowerCase()
+            }
+        })
+
+        if(!user){
+            res.status(400).json({message: "Invalid Credentials, User Doesn't exist"});
+            return;
+        }
+
+        const hashedPassword = await checkHashPasswords(password?.trim(), user.password);
+
+        if(!hashedPassword){
+            res.status(400).json({message: "Invalid Credentials"});
+            return;
+        }
+
+        generateSessionToken(email, res);
+        res.status(200).json({message: "Login Successfull"});
+    }catch(e){
+        console.log("@error in login controller ",e);
+        res.status(500).json({message: "Internal Server Error"})
+    }
+}
+
+export const logout = async(req:Request, res:Response)=>{
+    try{
+        res.cookie("sessionToken", null);
+        res.status(200).json({message: "Logout successfull"});
+    }catch(e){
+        console.log("@error at logout controller ", e);
         res.status(500).json({message: "Internal Server Error"});
     }
 }
