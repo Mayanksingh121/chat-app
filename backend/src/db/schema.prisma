@@ -30,5 +30,6 @@ model messages{
   id          Int       @id @default(autoincrement())
   senderId    Int   
   receiverId  Int
+  message     String
   createdAt   DateTime  @default(now())
 }

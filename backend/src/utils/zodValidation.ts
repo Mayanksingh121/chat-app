@@ -15,3 +15,9 @@ export const loginDataValidation = z.object({
     email: z.string().trim().regex(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,"Invalid Credentials"),
     password: z.string().trim().min(6, 'Invalid Credentials').max(20, "Invalid Credentials")
 })
+
+export const addMessageValidation = z.object({
+    email: z.string().trim().regex(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,"Invalid Email Address"),
+    receiverId: z.number({message: "Invalid receiverId"}),
+    messaeg: z.string({message: "Invalid message type"})
+})
