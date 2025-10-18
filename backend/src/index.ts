@@ -3,6 +3,7 @@ import {createServer} from "http";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import { createWsServer } from "./websocket";
+import cors from "cors";
 import mainRouter from "./routes/main.route";
 import { connetToRedisServer } from "./db/dbConnections";
 import { connetToPrismaClient } from "./db/dbConnections";
@@ -16,6 +17,7 @@ createWsServer(app);
 
 const startServer = async()=>{
 try{
+    server.use(cors());
     server.use(express.json());
     server.use(cookieParser());
     server.use("/api/v1", mainRouter)
