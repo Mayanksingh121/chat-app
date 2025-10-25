@@ -7,7 +7,7 @@ export const signup = async(userData: ISignupBody)=>{
         return response;
     }catch(e){
         console.log("@error while signing up ",e);
-        return null;
+        throw e;
     }
 }
 
@@ -17,6 +17,6 @@ export const login = async(userData: ILoginBody)=>{
         return response;
     }catch(e){
         console.log("@error while logging in ",e);
-        return null;
+        throw e;
     }
 }
