@@ -7,6 +7,7 @@ import { RxAvatar } from "react-icons/rx";
 import toast from "react-hot-toast";
 import validator from "validator";
 import { signup } from "@/services/apis";
+import OTPCard from "./OTPCard";
 
 const LoginCard = () => {
   const [isSignup, setIsSignup] = useState<boolean>(false);
@@ -40,7 +41,7 @@ const LoginCard = () => {
     if (response?.success) {
       toast.success(response?.message);
       setScreen("OTP");
-    }else{
+    } else {
       toast.error(response?.message);
     }
   };
@@ -56,83 +57,90 @@ const LoginCard = () => {
         </p>
       </div>
       <div className="bg-linear-to-b from-white/10 to-white/5 backdrop-blur-xl border border-white/20 rounded-xl md:rounded-3xl p-4 md:p-8 w-[90%] md:w-[60%]  lg:w-[30%]">
-       {screen === "Login"? <>
-       <div className="flex flex-col gap-3 md:gap-6">
-          {isSignup ? (
-            <div className="flex flex-col gap-2">
-              <p className="text-white font-body">Name</p>
-              <div className="w-full bg-white/5 border border-white/10 rounded-lg flex items-center gap-2 md:gap-4 px-2 md:px-3">
-                <RxAvatar color="#9da3af" size={20} />
-                <input
-                  onChange={(e) => setName(e.target.value)}
-                  className="font-body outline-none text-white py-3 w-[90%] text-sm"
-                  placeholder="Mayank Singh"
-                />
+        {screen === "Login" ? (
+          <>
+            <div className="flex flex-col gap-3 md:gap-6">
+              {isSignup ? (
+                <div className="flex flex-col gap-2">
+                  <p className="text-white font-body">Name</p>
+                  <div className="w-full bg-white/5 border border-white/10 rounded-lg flex items-center gap-2 md:gap-4 px-2 md:px-3">
+                    <RxAvatar color="#9da3af" size={20} />
+                    <input
+                      onChange={(e) => setName(e.target.value)}
+                      className="font-body outline-none text-white py-3 w-[90%] text-sm"
+                      placeholder="Mayank Singh"
+                    />
+                  </div>
+                </div>
+              ) : null}
+              <div className="flex flex-col gap-2">
+                <p className="text-white font-body">Email</p>
+                <div className="w-full bg-white/5 border border-white/10 rounded-lg flex items-center gap-4 px-3">
+                  <MdEmail color="#9da3af" />
+                  <input
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="font-body outline-none text-white py-3 w-[90%] text-sm"
+                    placeholder="mayank@example.com"
+                  />
+                </div>
+              </div>
+              <div className="flex flex-col gap-2">
+                <p className="text-white font-body">Password</p>
+                <div className="w-full bg-white/5 border border-white/10 rounded-lg flex items-center justify-between px-3">
+                  <div className="flex gap-4 items-center w-full">
+                    <FaLock color="#9da3af" />
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="font-body outline-none text-white py-3 w-[90%] text-sm"
+                      placeholder="**********"
+                    />
+                  </div>
+                  {showPassword ? (
+                    <IoIosEyeOff
+                      onClick={() => setShowPassword(false)}
+                      size={20}
+                      color="#9da3af"
+                    />
+                  ) : (
+                    <IoMdEye
+                      onClick={() => setShowPassword(true)}
+                      size={20}
+                      color="#9da3af"
+                    />
+                  )}
+                </div>
               </div>
             </div>
-          ) : null}
-          <div className="flex flex-col gap-2">
-            <p className="text-white font-body">Email</p>
-            <div className="w-full bg-white/5 border border-white/10 rounded-lg flex items-center gap-4 px-3">
-              <MdEmail color="#9da3af" />
-              <input
-                onChange={(e) => setEmail(e.target.value)}
-                className="font-body outline-none text-white py-3 w-[90%] text-sm"
-                placeholder="mayank@example.com"
-              />
+            <div className="flex flex-col w-full pt-3 gap-6">
+              <p className="text-[#2498e8] text-sm  md:text-[1rem] text-end w-full cursor-pointer hover:text-blue-500">
+                Forgot password?
+              </p>
+              <button
+                onClick={handleSignin}
+                className="bg-linear-to-r from-[#2498e8] to-[#67b3e6] w-full py-2 md:py-3 rounded-sm md:rounded-lg font-bold font-body cursor-pointer text-white text-sm md:text-[1rem}"
+              >
+                {isSignup ? "Register" : "Login"}
+              </button>
+              <p className="text-[#99a1af] font-body text-center w-full text-sm md:text-[1rem]">
+                {isSignup
+                  ? "Already have an account? "
+                  : "Don't have an account? "}
+                <span
+                  onClick={() => setIsSignup(!isSignup)}
+                  className="text-[#2498e8] cursor-pointer hover:text-blue-500"
+                >
+                  {isSignup ? "Login" : "Sign up"}
+                </span>
+              </p>
             </div>
+          </>
+        ) : (
+          <div className="flex flex-col gap-6 justify-center items-center">
+            <p className="font-body text-white text-xl text-center">Enter The OTP Sent To Email <span className="font-bold font-heading">{email?.trim()?.toLowerCase()}</span></p>
+            <OTPCard email={email}/>
           </div>
-          <div className="flex flex-col gap-2">
-            <p className="text-white font-body">Password</p>
-            <div className="w-full bg-white/5 border border-white/10 rounded-lg flex items-center justify-between px-3">
-              <div className="flex gap-4 items-center w-full">
-                <FaLock color="#9da3af" />
-                <input
-                  type={showPassword ? "text" : "password"}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="font-body outline-none text-white py-3 w-[90%] text-sm"
-                  placeholder="**********"
-                />
-              </div>
-              {showPassword ? (
-                <IoIosEyeOff
-                  onClick={() => setShowPassword(false)}
-                  size={20}
-                  color="#9da3af"
-                />
-              ) : (
-                <IoMdEye
-                  onClick={() => setShowPassword(true)}
-                  size={20}
-                  color="#9da3af"
-                />
-              )}
-            </div>
-          </div>
-        </div>
-        <div className="flex flex-col w-full pt-3 gap-6">
-          <p className="text-[#2498e8] text-sm  md:text-[1rem] text-end w-full cursor-pointer hover:text-blue-500">
-            Forgot password?
-          </p>
-          <button
-            onClick={handleSignin}
-            className="bg-linear-to-r from-[#2498e8] to-[#67b3e6] w-full py-2 md:py-3 rounded-sm md:rounded-lg font-bold font-body cursor-pointer text-white text-sm md:text-[1rem}"
-          >
-            {isSignup ? "Register" : "Login"}
-          </button>
-          <p className="text-[#99a1af] font-body text-center w-full text-sm md:text-[1rem]">
-            {isSignup ? "Already have an account? " : "Don't have an account? "}
-            <span
-              onClick={() => setIsSignup(!isSignup)}
-              className="text-[#2498e8] cursor-pointer hover:text-blue-500"
-            >
-              {isSignup ? "Login" : "Sign up"}
-            </span>
-          </p>
-        </div>
-        </>:
-        <>
-        </>}
+        )}
       </div>
     </div>
   );
