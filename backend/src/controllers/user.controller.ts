@@ -68,7 +68,7 @@ export const signup = async (req: Request, res: Response) => {
       60 * 5
     );
     sendSignupOTPEmail(email, otpForTheUser);
-    res.status(200).json({ message: "OTP Sent To Users Email" });
+    res.status(200).json({ message: "OTP Sent To Your Email" });
   } catch (e) {
     console.log("@error while signin up the user");
     res.status(500).json({ message: "internal server error" });
